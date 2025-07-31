@@ -14,7 +14,6 @@ async function getCsrfToken() {
       'Cookie': `.ROBLOSECURITY=${ROBLOSECURITY}`,
     },
   });
-
   const token = response.headers.get('x-csrf-token');
   if (!token) throw new Error('Failed to get CSRF token');
   return token;
@@ -22,10 +21,7 @@ async function getCsrfToken() {
 
 app.post('/setrank', async (req, res) => {
   const { userId, rankId } = req.body;
-
-  if (!userId || !rankId) {
-    return res.status(400).json({ error: 'Missing userId or rankId' });
-  }
+  if (!userId || !rankId) return res.status(400).json({ error: 'Missing userId or rankId' });
 
   try {
     const csrfToken = await getCsrfToken();
