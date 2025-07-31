@@ -8,13 +8,16 @@ const GROUP_ID = process.env.GROUP_ID;
 const ROBLOSECURITY = process.env.ROBLOSECURITY;
 
 async function getCsrfToken() {
-  let response = await fetch('https://groups.roblox.com', {
+  const response = await fetch(`https://groups.roblox.com/v1/groups/${GROUP_ID}/users/0`, {
     method: 'POST',
     headers: {
       'Cookie': `.ROBLOSECURITY=${ROBLOSECURITY}`,
     },
   });
-  return response.headers.get('x-csrf-token');
+
+  const token = response.headers.get('x-csrf-token');
+  if (!token) throw new Error('Failed to get CSRF token');
+  return token;
 }
 
 app.post('/setrank', async (req, res) => {
@@ -32,7 +35,7 @@ app.post('/setrank', async (req, res) => {
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
-        'Cookie': `${ROBLOSECURITY}`,
+        'Cookie': `.ROBLOSECURITY=${ROBLOSECURITY}`,
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': csrfToken,
       },
