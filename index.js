@@ -24,19 +24,28 @@ app.post('/setrank', async (req, res) => {
   if (!userId || !rankId) return res.status(400).json({ error: 'Missing userId or rankId' });
 
   try {
-    const csrfToken = await getCsrfToken();
-
+    let csrfToken = await getCsrfToken();
     const url = `https://groups.roblox.com/v1/groups/${GROUP_ID}/users/${userId}`;
 
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Cookie': `.ROBLOSECURITY=${ROBLOSECURITY}`,
-        'Content-Type': 'application/json',
-        'X-CSRF-TOKEN': csrfToken,
-      },
-      body: JSON.stringify({ rankId }),
-    });
+    async function patchRank(token) {
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Cookie': `.ROBLOSECURITY=${ROBLOSECURITY}`,
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': token,
+        },
+        body: JSON.stringify({ rankId }),
+      });
+      return response;
+    }
+
+    let response = await patchRank(csrfToken);
+
+    if (response.status === 403) {
+      csrfToken = await getCsrfToken();
+      response = await patchRank(csrfToken);
+    }
 
     if (!response.ok) {
       const text = await response.text();
