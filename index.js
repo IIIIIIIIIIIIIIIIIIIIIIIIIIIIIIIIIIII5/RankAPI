@@ -32,7 +32,7 @@ app.post('/setrank', async (req, res) => {
     const response = await fetch(url, {
       method: 'PATCH',
       headers: {
-        'Cookie': `.ROBLOSECURITY=${ROBLOSECURITY}`,
+        'Cookie': `${ROBLOSECURITY}`,
         'Content-Type': 'application/json',
         'X-CSRF-TOKEN': csrfToken,
       },
